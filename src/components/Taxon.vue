@@ -9,7 +9,7 @@ const props = defineProps({
 </script>
 
 <template>
-  <div class="col">
+  <div class="col-12 col-sm-12 col-md-6 col-lg-3">
     <div class="card">
       <img :src="props.imageUrl" class="card-img-top" :alt="props.imageUrl" />
       <div class="card-body">

@@ -55,7 +55,7 @@ watch(WKT, () => {
 <template>
   <div id="liste-taxons">
     <Loading :loadingStatus="loadingObservations" />
-    <div class="row row-cols-3 row-cols-md-4 g-4">
+    <div class="row g-4">
       <Taxon
         v-for="observation in speciesListShowed"
         :name="observation.acceptedScientificName"

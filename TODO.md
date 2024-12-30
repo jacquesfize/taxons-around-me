@@ -1,3 +1,3 @@
 - Prendre la date la plus proche dans l'affichage d'un taxon
-- Ajouter la pagination
 - Ajouter la possibilité de filtrer la liste de taxon
+- Ajuster le component de pagination lorsque le nombre de pages est trop important

@@ -5,6 +5,8 @@ and Simon Chevreau.
 
 Will soon be displaced in an official repo !
 
+Demo : https://jacquesfize.github.io/taxons-around-me/
+
 ## Customize configuration
 
 (Not for the moment)

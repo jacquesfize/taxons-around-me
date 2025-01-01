@@ -17,17 +17,22 @@ const props = defineProps({
   dateMax: String,
 });
 
-watchEffect(() => {
-  WKT.value = props.wkt;
-  dateMin.value = props.dateMin;
-  dateMax.value = props.dateMax;
-});
-
 const speciesList = ref([]);
 const loadingObservations = ref(false);
 
 const pageIndex = ref(0);
 const itemsPerPage = ref(props.itemPerPage ? props.itemPerPage : 10);
+
+watchEffect(() => {
+  WKT.value = props.wkt;
+  const date_changed =
+    dateMin.value != props.dateMin || dateMax.value != props.dateMax;
+  dateMin.value = props.dateMin;
+  dateMax.value = props.dateMax;
+  if (WKT.value && date_changed) {
+    refreshSpeciesList(WKT.value);
+  }
+});
 
 const speciesListShowed = computed(() => {
   return speciesList.value
@@ -55,10 +60,6 @@ function refreshSpeciesList(wkt) {
     loadingObservations.value = false;
   });
 }
-
-watch(props, () => {
-  WKT.value = props.wkt;
-});
 
 watch(WKT, () => {
   if (WKT.value) {

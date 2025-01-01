@@ -8,13 +8,11 @@ import L from "leaflet";
 import "leaflet-draw";
 import "leaflet/dist/leaflet.css";
 import "leaflet-draw/dist/leaflet.draw.css";
+import { toWKT } from "../lib/utils";
+import { parse, stringify } from "wellknown";
 
 // Vue
-import { onMounted, ref, shallowRef, watchEffect } from "vue";
-
-// External libs
-import { buffer } from "@turf/turf";
-import { stringify } from "wellknown";
+import { onMounted, ref, shallowRef, watch, watchEffect } from "vue";
 
 // Draw config
 import drawConfig from "./MapConfig";
@@ -56,30 +54,24 @@ onMounted(() => {
   // Add draw control
   map.value.addControl(new L.Control.Draw(drawConfig(geometry.value)));
 
-  // On Geometry change
-  map.value.on(L.Draw.Event.CREATED, function (event) {
-    // Retrieve the drawn layer
+  function addLayer(event) {
     let layer = event.layer;
-
     // Display the new geometry
     geometry.value.clearLayers();
     geometry.value.addLayer(layer);
 
     // Convert to WKT
-    let WKT = stringify(layer.toGeoJSON());
-
-    // If point or line, we buffer the geometry since API does not support them
+    const WKT = toWKT(layer, event.layerType, radius.value);
+    // If point or line, we buffer the geometry
     if (event.layerType == "marker" || event.layerType == "polyline") {
-      var buffered = buffer(layer.toGeoJSON(), radius.value);
-      WKT = stringify(buffered);
       let tmp = L.geoJSON().addTo(geometry.value);
-      tmp.addData(buffered);
+      tmp.addData(parse(WKT));
     }
 
-    // send geometry to parent
-    emit("geojson", layer.toGeoJSON());
     emit("wkt", WKT);
-  });
+  }
+
+  map.value.on(L.Draw.Event.CREATED, addLayer);
 });
 </script>
 

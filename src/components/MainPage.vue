@@ -1,7 +1,7 @@
 <script setup>
 import "leaflet/dist/leaflet.css";
 import Map from "./Map.vue";
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import ListeTaxon from "./ListeTaxon.vue";
 import Filters from "./Filters.vue";
 
@@ -9,6 +9,22 @@ const radius = ref(1);
 const wktSelected = ref("");
 const dateMin = ref(null);
 const dateMax = ref(null);
+
+onMounted(() => {
+  const params = new URLSearchParams(window.location.search);
+  if (params.has("radius")) {
+    radius.value = parseInt(params.get("radius"));
+  }
+  if (params.has("wkt")) {
+    wktSelected.value = params.get("wkt");
+  }
+  if (params.has("dateMin")) {
+    dateMin.value = params.get("dateMin");
+  }
+  if (params.has("dateMax")) {
+    dateMax.value = params.get("dateMax");
+  }
+});
 </script>
 
 <template>

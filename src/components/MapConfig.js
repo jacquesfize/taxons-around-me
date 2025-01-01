@@ -15,12 +15,8 @@ function drawConfig(featureGroup) {
         shapeOptions: {},
       },
       circlemarker: false,
-      circle: false, // Turns off this drawing tool
-      rectangle: {
-        shapeOptions: {
-          clickable: false,
-        },
-      },
+      circle: true, // Turns off this drawing tool
+      rectangle: true,
     },
     edit: {
       featureGroup: featureGroup,

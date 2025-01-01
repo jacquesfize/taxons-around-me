@@ -3,21 +3,30 @@ const DEFAULT_NB_MAX_TAXONS = 10;
 /**
  * Fetch a page of taxon data from GBIF given a WKT string
  * @param {string} wkt - Well-Known Text representation of a polygon
+ * @param {Object} paramsGBIF - parameters to pass to the API
  * @param {number} limit - number of results to return
  * @param {number} offset - offset of the first result
  * @returns {Promise<import('gbif-types').GBIFSearchResponse>}
  */
-function occurrenceTaxonGBIF(wkt, limit = null, offset = null) {
+function occurrenceTaxonGBIF(
+  wkt,
+  paramsGBIF = {},
+  limit = null,
+  offset = null
+) {
   let url = `https://api.gbif.org/v1/occurrence/search?geometry=${wkt}`;
   url += limit ? `&limit=${limit}` : "";
   url += offset ? `&offset=${offset}` : "";
+  for (const [key, value] of Object.entries(paramsGBIF)) {
+    url += `&${key}=${value}`;
+  }
   return fetch(url).then((response) => {
     return response.json();
   });
 }
 
 function countOccurrence(wkt) {
-  return occurrenceTaxonGBIF(wkt, 1).then((data) => {
+  return occurrenceTaxonGBIF(wkt, {}, 1).then((data) => {
     return data.count;
   });
 }
@@ -30,7 +39,7 @@ function countOccurrence(wkt) {
  */
 function getGbifTaxon(
   wkt,
-  nbMaxTaxons = DEFAULT_NB_MAX_TAXONS,
+  paramsGBIF = {},
   params = { limit: 300, maxPage: 10 }
 ) {
   return countOccurrence(wkt).then(async function (countOccurrence) {
@@ -44,7 +53,7 @@ function getGbifTaxon(
     let promises = [];
     for (let pageIndex = 0; pageIndex < nbOfPages; pageIndex++) {
       const offset = pageIndex * params.limit;
-      promises.push(occurrenceTaxonGBIF(wkt, params.limit, offset));
+      promises.push(occurrenceTaxonGBIF(wkt, paramsGBIF, params.limit, offset));
     }
     let speciesList = {};
     // Run all promises and await for the responses

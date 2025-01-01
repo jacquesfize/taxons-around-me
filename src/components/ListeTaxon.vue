@@ -1,17 +1,27 @@
 <script setup>
-import { computed, ref, watch } from "vue";
+import { computed, ref, watch, watchEffect } from "vue";
 import { getMedias } from "../lib/api/media";
 import Loading from "./commons/Loading.vue";
 import { getGbifTaxon } from "../lib/api/taxon";
 import Taxon from "./Taxon.vue";
 import Pagination from "./commons/Pagination.vue";
 
+const WKT = ref(null);
+const dateMin = ref(null);
+const dateMax = ref(null);
+
 const props = defineProps({
   wkt: String,
   itemPerPage: Number,
+  dateMin: String,
+  dateMax: String,
 });
 
-const WKT = ref(null);
+watchEffect(() => {
+  WKT.value = props.wkt;
+  dateMin.value = props.dateMin;
+  dateMax.value = props.dateMax;
+});
 
 const speciesList = ref([]);
 const loadingObservations = ref(false);
@@ -31,7 +41,11 @@ const speciesListShowed = computed(() => {
 function refreshSpeciesList(wkt) {
   loadingObservations.value = true;
   speciesList.value = [];
-  getGbifTaxon(wkt, 10, { maxPage: 2, limit: 300 }).then((response) => {
+  let paramsGBIF = {};
+  if (dateMin.value && dateMax.value) {
+    paramsGBIF = { eventDate: `${dateMin.value},${dateMax.value}` };
+  }
+  getGbifTaxon(wkt, paramsGBIF, { maxPage: 2, limit: 300 }).then((response) => {
     Object.values(response).forEach((observation) => {
       getMedias(observation.taxonKey).then((url) => {
         observation["media"] = url;
@@ -53,9 +67,20 @@ watch(WKT, () => {
 });
 </script>
 <template>
-  <div id="liste-taxons">
+  <div id="liste-taxons" class="mb-3">
+    <h2 class="col-12 text-center mb-3 mt-0 p-3">
+      <i class="bi bi-search"></i> Taxons observées
+    </h2>
     <Loading :loadingStatus="loadingObservations" />
-    <div class="row g-4">
+    <div
+      id="no-observation-message"
+      v-if="speciesListShowed.length == 0 && !loadingObservations"
+    >
+      <h4 class="col-12 text-center mb-3 mt-0 p-3">
+        <i class="bi bi-pin-map"></i> Dessiner une géométrie sur la carte
+      </h4>
+    </div>
+    <div class="row" id="species-listing">
       <Taxon
         v-for="observation in speciesListShowed"
         :name="observation.acceptedScientificName"
@@ -77,3 +102,23 @@ watch(WKT, () => {
     </div>
   </div>
 </template>
+<style>
+#liste-taxons {
+  background-color: white;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  height: 70vh;
+}
+#species-listing {
+  overflow: scroll;
+  height: 50vh;
+}
+#no-observation-message {
+  background-color: #efefef;
+  border-radius: 5px;
+}
+#no-observation-message h4 {
+  border: 2px dashed #666;
+  border-radius: 10px;
+}
+</style>

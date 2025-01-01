@@ -1,5 +1,5 @@
 <template>
-  <div id="map" style="height: 50vh"></div>
+  <div id="map"></div>
 </template>
 
 <script setup>
@@ -85,7 +85,7 @@ onMounted(() => {
 
 <style scoped>
 #map {
-  height: 50vh;
-  box-shadow: 1px 1px 5px #666;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
 }
 </style>

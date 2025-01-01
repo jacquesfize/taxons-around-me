@@ -3,21 +3,45 @@ import "leaflet/dist/leaflet.css";
 import Map from "./Map.vue";
 import { ref } from "vue";
 import ListeTaxon from "./ListeTaxon.vue";
+import Filters from "./Filters.vue";
 
-const selectedCoordinates = ref({});
+const radius = ref(1);
 const wktSelected = ref("");
+const dateMin = ref(null);
+const dateMax = ref(null);
 </script>
 
 <template>
-  <h1 id="title" class="col-12 text-center mb-3 mt-0 p-3">
-    🐦Taxons around me🐛
-  </h1>
-  <div class="container">
-    <Map
-      :radius="1"
-      @wkt="(drawGeometryWKT) => (wktSelected = drawGeometryWKT)"
-    />
-    <ListeTaxon :wkt="wktSelected" :itemPerPage="10" />
+  <div class="container-fluid">
+    <h1 id="title" class="col-12 text-center m-3">🐦Taxons around me🐛</h1>
+
+    <div class="row">
+      <div class="col m-2 mt-1 mb-3">
+        <Filters
+          :radius="radius"
+          @dateMin="(newDateMin) => (dateMin = newDateMin)"
+          @dateMax="(newDateMax) => (dateMax = newDateMax)"
+          @radius="(newradius) => (radius = parseInt(newradius))"
+        />
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-12 col-lg-6 col-md-6">
+        <Map
+          :radius="radius"
+          @wkt="(drawGeometryWKT) => (wktSelected = drawGeometryWKT)"
+        />
+      </div>
+      <div class="col-12 col-lg-6 col-md-6">
+        <ListeTaxon
+          :wkt="wktSelected"
+          :dateMin="dateMin"
+          :dateMax="dateMax"
+          :itemPerPage="10"
+        />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -25,11 +49,7 @@ const wktSelected = ref("");
 
 <style scoped>
 #map {
-  height: 50vh;
-}
-#title {
-  background-color: white;
-  box-shadow: 0px 0px 5px #666;
+  height: 70vh;
 }
 #liste-taxons {
   padding: 1em;

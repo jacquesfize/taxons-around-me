@@ -53,6 +53,18 @@ function decrementPage() {
 const maxNumberOfPages = computed(() => {
   return Math.ceil(totalItems.value / itemsPerPage.value);
 });
+
+const pageToShow = computed(() => {
+  if (maxNumberOfPages.value > 5) {
+    const start = pageIndex.value > 0 ? 0 : 1;
+    let arange = [];
+    for (let i = start; i < 5; i++) {
+      arange.push(pageIndex.value + i);
+    }
+    return arange;
+  }
+  return maxNumberOfPages.value;
+});
 </script>
 
 <template>
@@ -66,7 +78,7 @@ const maxNumberOfPages = computed(() => {
         <a class="page-link">Previous</a>
       </li>
       <li
-        v-for="i in maxNumberOfPages"
+        v-for="i in pageToShow"
         :key="i"
         :class="isActive(i - 1)"
         @click="pageIndex = i - 1"

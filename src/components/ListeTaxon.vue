@@ -70,7 +70,7 @@ watch(WKT, () => {
 <template>
   <div id="liste-taxons" class="mb-3">
     <h2 class="col-12 text-center mb-3 mt-0 p-3">
-      <i class="bi bi-search"></i> Taxons observées
+      <i class="bi bi-search"></i> Taxons observés
     </h2>
     <Loading :loadingStatus="loadingObservations" />
     <div

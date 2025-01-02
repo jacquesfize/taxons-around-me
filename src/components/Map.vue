@@ -8,7 +8,7 @@ import L from "leaflet";
 import "leaflet-draw";
 import "leaflet/dist/leaflet.css";
 import "leaflet-draw/dist/leaflet.draw.css";
-import { toWKT } from "../lib/utils";
+import { saveMapState, toWKT } from "../lib/utils";
 import { parse, stringify } from "wellknown";
 
 // Vue
@@ -39,7 +39,8 @@ const emit = defineEmits(["wkt", "geojson"]);
 // Component Lifecycle
 onMounted(() => {
   // Initialize map
-  map.value = L.map("map").setView([51.505, -0.09], 13);
+  map.value = L.map("map");
+  saveMapState(map.value);
 
   // Add tile layer
   L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -72,6 +73,14 @@ onMounted(() => {
   }
 
   map.value.on(L.Draw.Event.CREATED, addLayer);
+
+  window.addEventListener("beforeunload", function (e) {
+    const state = {
+      center: map.value.getCenter(),
+      zoom: map.value.getZoom(),
+    };
+    localStorage.setItem("mapState", JSON.stringify(state));
+  });
 });
 </script>
 
